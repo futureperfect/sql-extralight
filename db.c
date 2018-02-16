@@ -21,6 +21,23 @@ InputBuffer* new_input_buffer()
     return input_buffer;
 }
 
+enum MetaCommandResult_t {
+    METACOMMAND_SUCCESS,
+    METACOMMAND_UNRECOGNIZED
+};
+
+typedef enum MetaCommandResult_t MetaCommandResult;
+
+MetaCommandResult do_meta_command(InputBuffer* input_buffer)
+{
+    if(strcmp(input_buffer->buffer, ".exit") == 0)
+    {
+        exit(EXIT_SUCCESS);
+    } else {
+        return METACOMMAND_UNRECOGNIZED;
+    }
+}
+
 void print_prompt()
 {
     printf("db > ");
@@ -48,11 +65,16 @@ int main(int argc, char* argv[]) {
         print_prompt();
         read_input(input_buffer);
 
-        if(strcmp(input_buffer->buffer, ".exit") == 0)
+        if(input_buffer->buffer[0] == '.')
         {
-            exit(EXIT_SUCCESS);
-        } else {
-            printf("Unrecognized command '%s'.\n", input_buffer->buffer);
+            switch (do_meta_command(input_buffer))
+            {
+                case METACOMMAND_SUCCESS:
+                    continue;
+                case METACOMMAND_UNRECOGNIZED:
+                    printf("Unrecognized command '%s'\n", input_buffer->buffer);
+                    continue;
+            }
         }
     }
 }
