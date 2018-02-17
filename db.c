@@ -96,16 +96,30 @@ void read_input(InputBuffer* input_buffer)
     input_buffer->buffer[bytes_read - 1] = 0;
 }
 
-void execute_statement(Statement* statement)
+enum ExecuteResult_t {
+    EXECUTE_SUCCESS,
+    EXECUTE_TABLE_FULL
+};
+
+typedef enum ExecuteResult_t ExecuteResult;
+
+ExecuteResult execute_insert(Statement* statement)
+{
+    return EXECUTE_SUCCESS;
+}
+
+ExecuteResult execute_select(Statement* statement)
+{
+    return EXECUTE_SUCCESS;
+}
+ExecuteResult execute_statement(Statement* statement)
 {
     switch(statement->type)
     {
         case STATEMENT_INSERT:
-            printf("This is where we would do an insert.\n");
-            break;
+            return execute_insert(statement);
         case STATEMENT_SELECT:
-            printf("This is where we would do a select.\n");
-            break;
+            return execute_select(statement);
     }
 }
 int main(int argc, char* argv[]) {
@@ -138,7 +152,14 @@ int main(int argc, char* argv[]) {
                 continue;
         }
 
-        execute_statement(&statement);
-        printf("Executed\n");
+        switch(execute_statement(&statement))
+        {
+            case EXECUTE_SUCCESS:
+                printf("Executed.\n");
+                break;
+            case EXECUTE_TABLE_FULL:
+                printf("Error: table full.\n");
+                break;
+        }
     }
 }
